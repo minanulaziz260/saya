@@ -1,27 +1,8 @@
 /* ═══════════════════════════════════════
-   M Aziz – Personal Branding
-   main.js
+   M Aziz – Personal Branding | main.js
 ═══════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  /* ── PAGE LOADER ── */
-  const loader      = document.getElementById('loader');
-  const loaderFill  = document.querySelector('.loader-bar-fill');
-  const loaderPct   = document.querySelector('.loader-pct');
-
-  let pct = 0;
-  const interval = setInterval(() => {
-    pct += Math.random() * 18;
-    if (pct >= 100) {
-      pct = 100;
-      clearInterval(interval);
-      setTimeout(() => loader.classList.add('hidden'), 400);
-    }
-    loaderFill.style.width = pct + '%';
-    loaderPct.textContent  = Math.floor(pct) + '%';
-  }, 80);
-
 
   /* ── CUSTOM CURSOR ── */
   const cursor     = document.getElementById('cursor');
@@ -35,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor.style.top  = mouseY + 'px';
   });
 
-  // Ring mengikuti dengan lag
   (function animateRing() {
     ringX += (mouseX - ringX) * 0.12;
     ringY += (mouseY - ringY) * 0.12;
@@ -44,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animateRing);
   })();
 
-  // Hover effect pada elemen interaktif
   document.querySelectorAll('a, button, .tool-card, .about-card, .skill-tag').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
@@ -68,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburger.classList.toggle('open');
     navLinks.classList.toggle('open');
   });
-
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       hamburger.classList.remove('open');
@@ -77,8 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  /* ── ACTIVE NAV HIGHLIGHT ── */
-  const sections = document.querySelectorAll('section[id]');
+  /* ── ACTIVE NAV ── */
+  const sections  = document.querySelectorAll('section[id]');
   const navAnchors = document.querySelectorAll('.nav-links a');
 
   function updateActiveNav() {
@@ -96,52 +74,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((e, i) => {
       if (e.isIntersecting) {
-        setTimeout(() => {
-          e.target.classList.add('visible');
-          e.target.style.transitionDelay = '0s';
-        }, i * 80);
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
         revealObserver.unobserve(e.target);
       }
     });
   }, { threshold: 0.12 });
 
-  document.querySelectorAll('.tool-card, .about-card').forEach((el, i) => {
-    el.style.transitionDuration = '0.55s';
-    el.style.transitionProperty = 'opacity, transform, box-shadow';
-    revealObserver.observe(el);
-  });
+  document.querySelectorAll('.tool-card, .about-card').forEach(el => revealObserver.observe(el));
 
 
-  /* ── TYPEWRITER HERO ── */
-  const roles = ['Vibe Coder ✨', 'Bot Builder 🤖', 'Web Explorer 🌐', 'Always Building 🚀'];
-  let roleIdx = 0, charIdx = 0, deleting = false;
+  /* ── TYPEWRITER ── */
+  const roles  = ['Vibe Coder ✨', 'Bot Builder 🤖', 'Web Explorer 🌐', 'Always Building 🚀'];
+  let roleIdx  = 0, charIdx = 0, deleting = false;
   const typeEl = document.getElementById('typewriter');
 
   function type() {
     const current = roles[roleIdx];
     if (!deleting) {
       typeEl.textContent = current.slice(0, ++charIdx);
-      if (charIdx === current.length) {
-        deleting = true;
-        setTimeout(type, 1800);
-        return;
-      }
+      if (charIdx === current.length) { deleting = true; setTimeout(type, 1800); return; }
     } else {
       typeEl.textContent = current.slice(0, --charIdx);
-      if (charIdx === 0) {
-        deleting = false;
-        roleIdx = (roleIdx + 1) % roles.length;
-      }
+      if (charIdx === 0) { deleting = false; roleIdx = (roleIdx + 1) % roles.length; }
     }
     setTimeout(type, deleting ? 50 : 90);
   }
-  if (typeEl) setTimeout(type, 1200);
+  if (typeEl) setTimeout(type, 600);
 
 
   /* ── COUNT-UP STATS ── */
   function countUp(el) {
-    const target = el.dataset.count;
-    if (!target || isNaN(target)) return;
+    const target = +el.dataset.count;
+    if (!target) return;
     let count = 0;
     const step = Math.ceil(target / 60);
     const timer = setInterval(() => {
@@ -151,16 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 25);
   }
 
-  const statObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        countUp(e.target);
-        statObserver.unobserve(e.target);
-      }
-    });
+  const statObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { countUp(e.target); statObs.unobserve(e.target); } });
   }, { threshold: 0.5 });
-
-  document.querySelectorAll('.stat strong[data-count]').forEach(el => statObserver.observe(el));
+  document.querySelectorAll('.stat strong[data-count]').forEach(el => statObs.observe(el));
 
 
   /* ── CONTACT FORM ── */
@@ -171,23 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = form.querySelector('.btn-send');
       btn.textContent = '✓ Pesan Terkirim!';
       btn.style.background = '#4CAF50';
-      setTimeout(() => {
-        btn.textContent = 'Kirim Pesan →';
-        btn.style.background = '';
-        form.reset();
-      }, 3000);
+      setTimeout(() => { btn.textContent = 'Kirim Pesan →'; btn.style.background = ''; form.reset(); }, 3000);
     });
   }
 
 
   /* ── BACK TO TOP ── */
   const backTop = document.getElementById('back-top');
-  function toggleBackTop() {
-    backTop.classList.toggle('visible', window.scrollY > 400);
-  }
-  backTop.addEventListener('click', e => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  function toggleBackTop() { backTop.classList.toggle('visible', window.scrollY > 400); }
+  backTop.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 });

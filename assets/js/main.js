@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, { threshold: 0.12 });
 
-  document.querySelectorAll('.tool-card, .about-card').forEach(el => revealObserver.observe(el));
+  document.querySelectorAll('.tool-card, .about-card, .blog-card').forEach(el => revealObserver.observe(el));
 
 
   /* ── TYPEWRITER ── */
